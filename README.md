@@ -1,4 +1,6 @@
 # DeepFashion2 Dataset
+
+A comprehensive fashion dataset for Detection, Pose Estimation, Segmentation and Re-Identification of Clothing Images.
 ![image](https://github.com/switchablenorms/DeepFashion2/blob/master/images/deepfashion2_bigbang.png)
 
 DeepFashion2 is a comprehensive fashion dataset. It contains 491K diverse images of 13 popular clothing categories from both 
