@@ -12,5 +12,6 @@ Unlike standard datasets, DeepFashion2 offers high diversity by featuring over 4
 
 ## Use Cases
 Researchers and developers can leverage this dataset to build models for clothes detection, landmark and pose estimation, instance segmentation, and consumer-to-shop clothes retrieval.
+Additionally, the system allows users to upload their own images to test real-world detection and analysis capabilities.
 
 For full details, please refer to the official DeepFashion2 paper (CVPR 2019).
