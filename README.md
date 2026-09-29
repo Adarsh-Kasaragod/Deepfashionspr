@@ -1,7 +1,7 @@
 # DeepFashion2 Dataset
 
 A comprehensive fashion dataset for Detection, Pose Estimation, Segmentation and Re-Identification of Clothing Images.
-![image](https://github.com/switchablenorms/DeepFashion2/blob/master/images/deepfashion2_bigbang.png)
+
 
 DeepFashion2 is a comprehensive fashion dataset. It contains 491K diverse images of 13 popular clothing categories from both 
 commercial shopping stores and consumers. It totally has 801K clothing clothing items, where each item in an image is labeled 
@@ -11,7 +11,7 @@ Examples of DeepFashion2 are shown in Figure 1.
 
 <p align='center'>Figure 1: Examples of DeepFashion2.</p>
 
-![image](https://github.com/switchablenorms/DeepFashion2/blob/master/images/annotation.jpg)
+
 *<sub>From (1) to (4), each row represents clothes images with different variations. At each row, we partition the images into two groups, the left three columns represent clothes from commercial stores, while the right three columns are from customers.In each group, the three images indicate three levels of difficulty with respect to the corresponding variation.Furthermore, at each row, the items in these two groups of images are from the same clothing identity but from two different domains, that is, commercial and customer.The items of the same identity may have different styles such as color and printing.Each item is annotated with landmarks and masks.*
 # Announcements
 * **2020-2-6 We are holding DeepFashion2 challenges in CVPR 2020 Workshop including [Clothes Landmark Estimation](https://competitions.codalab.org/competitions/22966) and [Clothes Retrieval](https://competitions.codalab.org/competitions/22967). Detailed information is available in [Third Workshop on 
@@ -55,13 +55,13 @@ The definition of landmarks and skeletons of 13 categories are shown below. The 
 
 <p align='center'>Figure 2: Definitions of landmarks and skeletons.</p>
 
-![image](https://github.com/switchablenorms/DeepFashion2/blob/master/images/cls.jpg)
+
 
 We do not provide data in pairs. In training dataset, images are organized with continuous 'pair_id' including images from consumers and images from shops. (For example: 000001.jpg(pair_id:1; from consumer), 000002.jpg(pair_id:1; from shop),000003.jpg(pair_id:2; from consumer),000004.jpg(pair_id:2; from consumer),000005.jpg(pair_id:2; from consumer), 000006.jpg(pair_id:2; from consumer),000007.jpg(pair_id:2; from shop),000008.jpg(pair_id:2; from shop)...) A clothing item from shop images and a clothing item from consumer image are positive commercial-consumer pair if they have the same style number which is greater than 0 and they are from images with the same pair id, otherwise they are negative pairs. In this way, you can construct training positive pairs and negative pairs in instance-level.
 
 As is shown in the figure below, the first three images are from consumers and the last two images are from shops. These five images have the same 'pair_id'. Clothing items in orange bounding box have the same 'style':1. Clothing items in green bounding box have the same 'style': 2. 'Style' of other clothing items whose bouding boxes are not drawn in the figure is 0 and they can not construct positive commercial-consumer pairs. One positive commercial-consumer pair is the annotated short sleeve top in the first image and the annotated short sleeve top in the last image. Our dataset makes it possbile to construct instance-level pairs in a flexible way.
 
-![image](https://github.com/switchablenorms/DeepFashion2/blob/master/images/pair.jpg)
+
 
 # Data Description
 Training images: train/image              Training annotations: train/annos
@@ -95,7 +95,7 @@ Figure 3 shows the statistics of different variations and the numbers of items o
 
 <p align='center'>Figure 3: Statistics of DeepFashion2.</p>
 
-![image](https://github.com/switchablenorms/DeepFashion2/blob/master/images/statistics_all.jpg)
+
 
 # Benchmarks
 ## Clothes Detection
@@ -140,7 +140,7 @@ Figure 4 shows the results of landmark and pose estimation.
 
 <p align='center'>Figure 4: Results of landmark and pose estimation.</p>
 
-![image](https://github.com/switchablenorms/DeepFashion2/blob/master/images/keys_vis.jpg)
+
 
 ## Clothes Segmentation
 This task assigns a category label (including background label) to each pixel in an item.The evaluation metrics is the average precision including <a href="https://www.codecogs.com/eqnedit.php?latex=${AP}_{mask}$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?${AP}_{mask}$" title="${AP}_{mask}$" /></a>,<a href="https://www.codecogs.com/eqnedit.php?latex=${AP}_{mask}^{IoU=0.50}$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?${AP}_{mask}^{IoU=0.50}$" title="${AP}_{mask}^{IoU=0.50}$" /></a>,<a href="https://www.codecogs.com/eqnedit.php?latex=${AP}_{mask}^{IoU=0.75}$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?${AP}_{mask}^{IoU=0.75}$" title="${AP}_{mask}^{IoU=0.75}$" /></a> computed over masks.
@@ -164,7 +164,7 @@ Figure 5 shows the results of clothes segmentation.
 
 <p align='center'>Figure 5: Results of clothes segmentation.</p>
 
-![image](https://github.com/switchablenorms/DeepFashion2/blob/master/images/seg_vis.jpg)
+
  
 ## Consumer-to-Shop Clothes Retrieval
 Given a detected item from a consumer-taken photo, this task aims to search the commercial images in the gallery for the items that are corresponding to this detected item. In this task, top-k retrieval accuracy is employed as the evaluation metric. We emphasize the retrieval performance while still consider the influence of detector. If a clothing item fails to be detected, this query item is counted as missed.
@@ -194,7 +194,7 @@ Figure 6 shows queries with top-5 retrieved clothing items. The first and the se
 
 <p align='center'>Figure 6: Results of clothes retrieval.</p>
 
-![image](https://github.com/switchablenorms/DeepFashion2/blob/master/images/retrieval_vis.jpg)
+
 
 # Acknowledgment
 
