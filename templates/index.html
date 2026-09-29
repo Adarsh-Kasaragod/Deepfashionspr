@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepFashion2 Explorer</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --border: #334155;
+            --box-color: #ef4444;
+            --kp-color: #10b981;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 350px;
+            background-color: var(--panel-bg);
+            border-right: 1px solid var(--border);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .header h1 {
+            margin: 0 0 8px 0;
+            font-size: 1.5rem;
+            background: linear-gradient(to right, #60a5fa, #34d399);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .header p {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            flex-direction: column;
+        }
+
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #0f172a;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .toggle-group label {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .info-panel {
+            background-color: #0f172a;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            flex-grow: 1;
+        }
+
+        .item-card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--box-color);
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+
+        .item-title {
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            position: relative;
+        }
+
+        .canvas-container {
+            position: relative;
+            max-width: 100%;
+            max-height: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        img#source-image {
+            display: block;
+            max-width: 100%;
+            max-height: calc(100vh - 48px);
+            object-fit: contain;
+        }
+
+        canvas#overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(15, 23, 42, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            z-index: 10;
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="header">
+            <h1>DeepFashion2</h1>
+            <p>Dataset Explorer & Visualizer</p>
+        </div>
+
+        <div class="controls">
+            <button onclick="loadRandomSample()">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                Load Random Image
+            </button>
+            
+            <div style="display: flex; gap: 8px;">
+                <input type="file" id="file-upload" style="display: none;" accept="image/*" onchange="uploadImage()">
+                <button onclick="document.getElementById('file-upload').click()" style="flex: 1; background-color: #10b981;">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    Upload Image
+                </button>
+            </div>
+            
+            <div class="toggle-group">
+                <label>
+                    <input type="checkbox" id="show-boxes" checked onchange="drawOverlay()">
+                    Bounding Boxes
+                </label>
+            </div>
+            <div class="toggle-group">
+                <label>
+                    <input type="checkbox" id="show-landmarks" checked onchange="drawOverlay()">
+                    Landmarks
+                </label>
+            </div>
+        </div>
+
+        <div class="info-panel" id="info-panel">
+            <p>Click "Load Random Image" to explore the validation dataset, or "Upload Image" to test a novel image.</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="loading-overlay" id="loading">Loading...</div>
+        <div class="canvas-container">
+            <img id="source-image" src="" alt="Dataset sample" style="display: none;">
+            <canvas id="overlay"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const img = document.getElementById('source-image');
+        const canvas = document.getElementById('overlay');
+        const ctx = canvas.getContext('2d');
+        const infoPanel = document.getElementById('info-panel');
+        const loading = document.getElementById('loading');
+        
+        let currentAnnotations = null;
+
+        img.onload = () => {
+            img.style.display = 'block';
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            drawOverlay();
+            loading.classList.remove('active');
+        };
+
+        async function uploadImage() {
+            const fileInput = document.getElementById('file-upload');
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            loading.innerText = 'Predicting Landmarks...';
+            loading.classList.add('active');
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    loading.classList.remove('active');
+                    return;
+                }
+
+                currentAnnotations = data.annotations;
+                img.src = data.image_url;
+                updateInfoPanel(data.image_id, data.annotations);
+                
+            } catch (err) {
+                console.error(err);
+                alert("Failed to upload image");
+                loading.classList.remove('active');
+            }
+        }
+
+        async function loadRandomSample() {
+            loading.innerText = 'Loading...';
+            loading.classList.add('active');
+            try {
+                const response = await fetch('/api/random_sample');
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    loading.classList.remove('active');
+                    return;
+                }
+
+                currentAnnotations = data.annotations;
+                img.src = data.image_url;
+                updateInfoPanel(data.image_id, data.annotations);
+                
+            } catch (err) {
+                console.error(err);
+                alert("Failed to load sample");
+                loading.classList.remove('active');
+            }
+        }
+
+        function updateInfoPanel(imageId, annotations) {
+            let html = `<div style="margin-bottom: 12px; color: white;">Image: <b>${imageId}.jpg</b></div>`;
+            
+            for (const [key, item] of Object.entries(annotations)) {
+                if (key === 'source' || key === 'pair_id') continue;
+                
+                const kpCount = item.landmarks ? item.landmarks.filter((v, i) => i % 3 === 2 && v > 0).length : 0;
+                
+                html += `
+                    <div class="item-card">
+                        <div class="item-title">${item.category_name}</div>
+                        <div>ID: ${key}</div>
+                        <div>Style: ${item.style}</div>
+                        <div>Scale: ${['Small', 'Modest', 'Large'][item.scale-1] || 'Unknown'}</div>
+                        <div>Landmarks: ${kpCount} visible</div>
+                    </div>
+                `;
+            }
+            
+            infoPanel.innerHTML = html;
+        }
+
+        function drawOverlay() {
+            if (!currentAnnotations) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const showBoxes = document.getElementById('show-boxes').checked;
+            const showLandmarks = document.getElementById('show-landmarks').checked;
+
+            const pointRadius = Math.max(4, Math.round(canvas.width / 120));
+            const lineWidth = Math.max(3, Math.round(canvas.width / 250));
+
+            for (const [key, item] of Object.entries(currentAnnotations)) {
+                if (key === 'source' || key === 'pair_id') continue;
+
+                if (showBoxes && item.bounding_box) {
+                    const [x1, y1, x2, y2] = item.bounding_box;
+                    const w = x2 - x1;
+                    const h = y2 - y1;
+                    
+                    ctx.strokeStyle = '#ef4444'; // Red
+                    ctx.lineWidth = lineWidth;
+                    ctx.strokeRect(x1, y1, w, h);
+                    
+                    // Label background
+                    const labelText = item.category_name;
+                    ctx.font = 'bold 16px Inter';
+                    const textWidth = ctx.measureText(labelText).width;
+                    ctx.fillStyle = '#ef4444';
+                    ctx.fillRect(x1, Math.max(0, y1 - 28), textWidth + 16, 28);
+                    
+                    // Label text
+                    ctx.fillStyle = 'white';
+                    ctx.fillText(labelText, x1 + 8, Math.max(18, y1 - 8));
+                }
+
+                if (showLandmarks && item.landmarks) {
+                    const lms = item.landmarks;
+                    for (let i = 0; i < lms.length; i += 3) {
+                        const x = lms[i];
+                        const y = lms[i+1];
+                        const v = lms[i+2]; // visibility
+                        
+                        if (v > 0 && x > 0 && y > 0) { // Visible or occluded (but labeled)
+                            ctx.beginPath();
+                            ctx.arc(x, y, pointRadius, 0, 2 * Math.PI);
+                            ctx.fillStyle = v === 2 ? '#10b981' : '#f59e0b'; // Green if visible, orange if occluded
+                            ctx.fill();
+                            ctx.strokeStyle = '#022c22';
+                            ctx.lineWidth = Math.max(1, Math.round(pointRadius / 3));
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Load initial
+        loadRandomSample();
+        
+        // Redraw on window resize to maintain alignment
+        window.addEventListener('resize', () => {
+            if (img.src) {
+                drawOverlay();
+            }
+        });
+    </script>
+</body>
+</html>
